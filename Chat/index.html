@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="chat.css" />
+
+    <title>Somativa de Lima</title>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,700;1,500&display=swap"
+      rel="stylesheet"
+    />
+
+    <script src="teste.js"></script>
+  </head>
+
+  <body>
+      <div>
+        <div class="chat">
+            <div id="conteudo"></div>
+          </div>
+      
+          <input type="text" placeholder="Digite sua mensagem" id="msg" />
+          <input type="submit" value="Enviar" class="botao" id="butao" />
+      </div>
+    <script type="module">
+      var input = document.getElementById("msg");
+      input.addEventListener("keypress", function (event) {
+        if (event.key === "Enter") {
+          enviarMSG();
+        }
+      });
+        document.getElementById("butao").addEventListener("click", (() => {
+            enviarMSG()
+        }));
+
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.4.0/firebase-app.js";
+      import {
+        getDatabase,
+        ref,
+        set,
+        push,
+        remove,
+        onValue,
+      } from "https://www.gstatic.com/firebasejs/9.4.0/firebase-database.js";
+
+      var firebaseConfig = {
+        apiKey: "AIzaSyCk6DZ3AzD94H52crcyhrAhQ9ZovemnZ-Q",
+        authDomain: "chat-app-a761e.firebaseapp.com",
+        projectId: "chat-app-a761e",
+        storageBucket: "chat-app-a761e.appspot.com",
+        messagingSenderId: "767776715184",
+        appId: "1:767776715184:web:a5984a222e3eeb6320a675",
+      };
+
+      const app = initializeApp(firebaseConfig);
+
+      var db = getDatabase(app);
+      const dbRef = ref(db, "turma3", "turma4");
+
+      var meuhtml = "";
+
+      var nomeUsuario = prompt("Digite seu nome");
+
+      onValue(dbRef, (snapshot) => {
+        const data = snapshot.val();
+        console.log(data);
+        meuhtml = "";
+        snapshot.forEach(function (childSnapshot) {
+          var key = childSnapshot.key;
+          console.log(key);
+          console.log(childSnapshot.val().nome);
+          console.log(childSnapshot.val().mensagem);
+
+
+        if (nomeUsuario == childSnapshot.val().nome) {
+            meuhtml += '<div class="bo"><div class="eu"><div class="hoho self"><b>' + childSnapshot.val().nome + '</b><span>' + childSnapshot.val().mensagem + '<span><br><div class="hour">' + childSnapshot.val().horario + '</div></div></div></div>'
+        } else {
+            meuhtml += '<div class="bo"><div class="outros"><div class="hoho"><b>' + childSnapshot.val().nome + '</b><span>' + childSnapshot.val().mensagem + '<span><br><div class="hour">' + childSnapshot.val().horario + '</div></div></div></div>'
+        }
+
+        });
+        atualizarHTML();
+      });
+
+      function enviarMSG() {
+        var datahj = new Date();
+        var hora =
+          datahj.getHours() +
+          ":" +
+          datahj.getMinutes() +
+          ":" +
+          datahj.getSeconds();
+
+        push(ref(db, "turma3"), {
+          nome: nomeUsuario,
+          horario: hora,
+          mensagem: document.getElementById("msg").value,
+        });
+
+        document.getElementById("msg").value = "";
+      }
+
+      function atualizarHTML() {
+        document.getElementById("conteudo").innerHTML = meuhtml;
+        ajustarScroll();
+      }
+
+      function ajustarScroll() {
+        console.log("corrirgir scroll");
+        var divConteudo = document.getElementById("conteudo");
+        divConteudo.scrollTop = divConteudo.scrollHeight;
+      }
+    </script>
+  </body>
+</html>
